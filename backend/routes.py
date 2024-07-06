@@ -3,7 +3,7 @@ from flask import request, jsonify
 from models import Friend
 
 # Get all friends
-@app.route('/friends', methods=['GET'])
+@app.route('/api/friends', methods=['GET'])
 def get_friends():
     friends = Friend.query.all()
     friends = [friend.to_json() for friend in friends]
@@ -17,8 +17,8 @@ def create_friend():
 
         required_fields = ['name', 'role', 'description','gender']
         for field in required_fields:
-            if field not in data:
-                return jsonify({"msg": f"Missing : '{field}' is required"}), 400   
+            if field not in data or not data.get(field):
+                return jsonify({"error": f"Missing : '{field}' is required"}), 400   
 
         name = data.get('name')
         role = data.get('role')
@@ -42,7 +42,7 @@ def create_friend():
         return jsonify(new_friend.to_json()), 201
     except Exception as e:
         db.session.rollback()
-        return jsonify({"msg": "Failed to create friend!"}), 500
+        return jsonify({"error": "Failed to create friend!"}), 500
                             
     
 #Delete friend
